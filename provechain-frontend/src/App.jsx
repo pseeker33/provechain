@@ -17,7 +17,11 @@ function App() {
 
   const chartData = {
     labels: ['Score', 'Restante'],
-    datasets: [{ data: result ? [result.score, 100 - result.score] : [0, 100], backgroundColor: ['#007bff', '#e0e0e0'] }],
+    datasets: [
+      { data: result ? [result.score, 100 - result.score] : [0, 100], 
+        backgroundColor: ['#007bff', '#e0e0e0'] 
+      }
+    ],
   };
 
   return (
