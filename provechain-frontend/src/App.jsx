@@ -1,35 +1,43 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import axios from 'axios';
+import { Doughnut } from 'react-chartjs-2';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import './App.css';
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [wallet, setWallet] = useState('');
+  const [result, setResult] = useState(null);
+
+  const fetchScore = async () => {
+    const response = await axios.get(`http://localhost:3000/wallet/${wallet}`);
+    setResult(response.data);
+  };
+
+  const chartData = {
+    labels: ['Score', 'Restante'],
+    datasets: [{ data: result ? [result.score, 100 - result.score] : [0, 100], backgroundColor: ['#007bff', '#e0e0e0'] }],
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="App">
+      <h1>ProveChain - Reputation Score</h1>
+      <input value={wallet} onChange={(e) => setWallet(e.target.value)} placeholder="Ingresa una wallet" />
+      <button onClick={fetchScore}>Calcular Score</button>
+      {result && result.score !== undefined && (
+        <div>
+          <h2>Score: {result.score}/100</h2>
+          <div style={{ maxWidth: '300px', margin: '0 auto' }}>
+            <Doughnut data={chartData} />
+          </div>
+          <p>Transacciones: {result.txCount}</p>
+          <p>Días Activo: {result.daysActive}</p>
+          <p>Balance: {result.balance} ETH</p>
+        </div>
+      )}
+    </div>
+  );
 }
 
-export default App
+export default App;
